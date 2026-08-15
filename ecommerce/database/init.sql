@@ -1,0 +1,34 @@
+CREATE TABLE IF NOT EXISTS products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    image_url TEXT
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    total_amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INTEGER REFERENCES products(id),
+    quantity INTEGER NOT NULL,
+    price DECIMAL(10,2) NOT NULL
+);
+
+INSERT INTO products (name, description, price, image_url)
+SELECT *
+FROM (
+    VALUES
+      ('Laptop', 'Powerful laptop for work and study', 59999.00, ''),
+      ('Headphones', 'Wireless over-ear headphones', 2999.00, ''),
+      ('Keyboard', 'Mechanical keyboard', 2499.00, ''),
+      ('Mouse', 'Wireless ergonomic mouse', 999.00, '')
+) AS sample(name, description, price, image_url)
+WHERE NOT EXISTS (
+    SELECT 1 FROM products
+);
