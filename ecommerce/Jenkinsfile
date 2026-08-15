@@ -1,0 +1,84 @@
+pipeline {
+
+    agent any
+
+    environment {
+        DOCKERHUB_USERNAME = 'ashasrivallibanka'
+        FRONTEND_IMAGE = "${DOCKERHUB_USERNAME}/ecommerce-frontend"
+        BACKEND_IMAGE = "${DOCKERHUB_USERNAME}/ecommerce-backend"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Backend Install') {
+            steps {
+                dir('backend') {
+                    sh 'npm ci'
+                }
+            }
+        }
+
+        stage('Frontend Install and Build') {
+            steps {
+                dir('frontend') {
+                    sh 'npm ci'
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker build -t $BACKEND_IMAGE:$BUILD_NUMBER ./backend'
+                sh 'docker build -t $FRONTEND_IMAGE:$BUILD_NUMBER ./frontend'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_TOKEN'
+                    )
+                ]) {
+                    sh 'echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                sh 'docker push $BACKEND_IMAGE:$BUILD_NUMBER'
+                sh 'docker push $FRONTEND_IMAGE:$BUILD_NUMBER'
+
+                sh 'docker tag $BACKEND_IMAGE:$BUILD_NUMBER $BACKEND_IMAGE:latest'
+                sh 'docker tag $FRONTEND_IMAGE:$BUILD_NUMBER $FRONTEND_IMAGE:latest'
+
+                sh 'docker push $BACKEND_IMAGE:latest'
+                sh 'docker push $FRONTEND_IMAGE:latest'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'E-Commerce CI pipeline completed successfully.'
+        }
+
+        failure {
+            echo 'E-Commerce CI pipeline failed.'
+        }
+
+        always {
+            sh 'docker logout || true'
+        }
+    }
+}
