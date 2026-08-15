@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+header {
+  padding: 20px;
+  background: #222;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+main {
+  padding: 30px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.product-card button {
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+}
+
+.cart {
+  margin-top: 40px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
