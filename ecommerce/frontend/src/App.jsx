@@ -67,7 +67,7 @@ const placeOrder = async () => {
   return (
     <div className="app">
       <header>
-        <h1>DevOps E-Commerce Store</h1>
+        <h1>E-Commerce Store</h1>
         <p>Cart: {cart.length} item(s)</p>
       </header>
 
