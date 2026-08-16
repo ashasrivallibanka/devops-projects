@@ -1,0 +1,38 @@
+---
+- name: Configure E-Commerce Application Server
+  hosts: appservers
+  become: true
+
+  tasks:
+
+    - name: Update installed packages
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+
+    - name: Install required packages
+      ansible.builtin.dnf:
+        name:
+          - git
+          - docker
+        state: present
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add ec2-user to Docker group
+      ansible.builtin.user:
+        name: ec2-user
+        groups: docker
+        append: true
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: /opt/ecommerce
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: "0755"
