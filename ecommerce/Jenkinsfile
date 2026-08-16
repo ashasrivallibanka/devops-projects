@@ -71,15 +71,32 @@ pipeline {
                 sh 'docker push $FRONTEND_IMAGE:latest'
             }
         }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    kubectl set image deployment/backend \
+                      backend=$BACKEND_IMAGE:$BUILD_NUMBER \
+                      -n ecommerce
+
+                    kubectl set image deployment/frontend \
+                      frontend=$FRONTEND_IMAGE:$BUILD_NUMBER \
+                      -n ecommerce
+
+                    kubectl rollout status deployment/backend -n ecommerce
+                    kubectl rollout status deployment/frontend -n ecommerce
+                '''
+            }
+        }
     }
 
     post {
         success {
-            echo 'E-Commerce CI pipeline completed successfully.'
+            echo 'E-Commerce CI/CD pipeline completed successfully.'
         }
 
         failure {
-            echo 'E-Commerce CI pipeline failed.'
+            echo 'E-Commerce CI/CD pipeline failed.'
         }
 
         always {
