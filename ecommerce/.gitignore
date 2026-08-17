@@ -1,10 +1,11 @@
-# Node dependencies
+# Node
 backend/node_modules/
 frontend/node_modules/
 
 # Environment files
 backend/.env
 frontend/.env
+.env
 
 # Build output
 frontend/dist/
@@ -18,6 +19,9 @@ frontend/dist/
 *.tfstate.*
 terraform.tfvars
 
+# Kubernetes secrets
+kubernetes/secret.yaml
+
 # Ansible secrets
 vault.yml
 
@@ -25,7 +29,7 @@ vault.yml
 *.pem
 *.key
 
-# OS/editor files
-.DS_Store
+# Editors / OS
 .vscode/
 .idea/
+.DS_Store
